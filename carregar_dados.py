@@ -7,10 +7,13 @@ import os
 openai.api_key = os.getenv("OPENAI_API_KEY")
 # Textos que simulam o conteúdo extraído do seu PDF
 textos = [
-    "RelaxHerbs é um suplemento natural com valeriana, passiflora e camomila. Ajuda na ansiedade e insônia leve.",
-    "SleepWell contém melatonina e L-teanina. Ideal para quem sofre de insônia.",
-    "EnergyBoost é um suplemento energético com cafeína, guaraná e ginseng. Melhora disposição física e mental."
+    "OmegaCalm é um suplemento com ômega-3, indicado para suporte ao humor e saúde mental.",
+    "SonoZen combina triptofano e melatonina para auxiliar no sono profundo e relaxamento.",
+    "NeuroPlus contém GABA e ashwagandha, ideal para reduzir o estresse e aumentar o foco.",
+    "VitaMulher é um multivitamínico desenvolvido para mulheres, com ferro e ácido fólico.",
+    "FocusFast é indicado para concentração e memória, com cafeína, taurina e colina."
 ]
+
 
 vetores = []
 
