@@ -18,15 +18,19 @@ def extrair_textos_pdf(caminho_pdf):
     return textos
 
 # --- 2. Divide em blocos menores (evita estourar limite do embedding) ---
-def dividir_blocos(textos, max_chars=1000):
+def dividir_blocos(textos, max_chars=500):
     blocos = []
     for texto in textos:
-        while len(texto) > max_chars:
-            corte = texto[:max_chars]
-            blocos.append(corte)
-            texto = texto[max_chars:]
-        if texto:
-            blocos.append(texto)
+        paragrafos = texto.split('\n')
+        bloco = ""
+        for paragrafo in paragrafos:
+            if len(bloco) + len(paragrafo) < max_chars:
+                bloco += paragrafo.strip() + " "
+            else:
+                blocos.append(bloco.strip())
+                bloco = paragrafo.strip() + " "
+        if bloco:
+            blocos.append(bloco.strip())
     return blocos
 
 # --- 3. Embedding dos blocos e criação do índice FAISS ---
