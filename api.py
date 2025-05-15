@@ -1,3 +1,4 @@
+from flask_cors import CORS
 from flask import Flask, request, jsonify
 import faiss
 import openai
@@ -12,6 +13,7 @@ with open("dados.json", "r") as f:
     textos = json.load(f)
 
 app = Flask(__name__)
+CORS(app, origins=["https://zerogame.com.br"])
 
 @app.route("/buscar-contexto", methods=["POST"])
 def buscar_contexto():
