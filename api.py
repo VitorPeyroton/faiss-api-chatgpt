@@ -1,5 +1,5 @@
-from flask_cors import CORS
 from flask import Flask, request, jsonify
+from flask_cors import CORS
 import faiss
 import openai
 import numpy as np
@@ -13,9 +13,13 @@ with open("dados.json", "r") as f:
     textos = json.load(f)
 
 app = Flask(__name__)
-CORS(app, resources={r"/*": {"origins": "*"}})
+CORS(app, supports_credentials=True)
 
-@app.route("/buscar-contexto", methods=["POST"])
+index = faiss.read_index("index.faiss")
+with open("dados.json", "r") as f:
+    textos = json.load(f)
+
+@app.route("/buscar-contexto", methods=["POST", "OPTIONS"])
 def buscar_contexto():
     data = request.get_json()
     pergunta = data["pergunta"]
