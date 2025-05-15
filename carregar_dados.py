@@ -2,24 +2,42 @@ import faiss
 import openai
 import numpy as np
 import json
-
 import os
-openai.api_key = os.getenv("OPENAI_API_KEY")
-# Textos que simulam o conteúdo extraído do seu PDF
-textos = [
-    "OmegaCalm é um suplemento com ômega-3, indicado para suporte ao humor e saúde mental.",
-    "SonoZen combina triptofano e melatonina para auxiliar no sono profundo e relaxamento.",
-    "NeuroPlus contém GABA e ashwagandha, ideal para reduzir o estresse e aumentar o foco.",
-    "VitaMulher é um multivitamínico desenvolvido para mulheres, com ferro e ácido fólico.",
-    "FocusFast é indicado para concentração e memória, com cafeína, taurina e colina."
-]
+import fitz  # PyMuPDF
 
+openai.api_key = os.getenv("OPENAI_API_KEY")
+
+# --- 1. Extrai o texto do PDF ---
+def extrair_textos_pdf(caminho_pdf):
+    doc = fitz.open(caminho_pdf)
+    textos = []
+    for pagina in doc:
+        texto = pagina.get_text().strip()
+        if texto:
+            textos.append(texto)
+    return textos
+
+# --- 2. Divide em blocos menores (evita estourar limite do embedding) ---
+def dividir_blocos(textos, max_chars=1000):
+    blocos = []
+    for texto in textos:
+        while len(texto) > max_chars:
+            corte = texto[:max_chars]
+            blocos.append(corte)
+            texto = texto[max_chars:]
+        if texto:
+            blocos.append(texto)
+    return blocos
+
+# --- 3. Embedding dos blocos e criação do índice FAISS ---
+pdf_path = "base-de-conhecimento-vitor-peyroton.pdf"
+textos_pdf = extrair_textos_pdf(pdf_path)
+blocos = dividir_blocos(textos_pdf)
 
 vetores = []
-
-for texto in textos:
+for bloco in blocos:
     resposta = openai.Embedding.create(
-        input=texto,
+        input=bloco,
         model="text-embedding-3-small"
     )
     vetor = np.array(resposta['data'][0]['embedding'], dtype='float32')
@@ -30,6 +48,6 @@ index.add(np.array(vetores))
 
 faiss.write_index(index, "index.faiss")
 
-# Salva os textos para depois retornar os correspondentes
+# Salva os textos em JSON
 with open("dados.json", "w") as f:
-    json.dump(textos, f)
+    json.dump(blocos, f)
