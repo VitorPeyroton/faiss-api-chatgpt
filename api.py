@@ -26,11 +26,12 @@ def buscar_contexto():
 
     resposta = openai.Embedding.create(
         input=pergunta,
-        model="text-embedding-ada-002"
+        model="text-embedding-3-small"
     )
+
     vetor = np.array(resposta["data"][0]["embedding"]).astype("float32")
 
-    D, I = index.search(np.array([vetor]), k=2)
+    D, I = index.search(np.array([vetor]), k=5)
     resultados = [textos[i] for i in I[0]]
 
     return jsonify({"trechos": resultados})
